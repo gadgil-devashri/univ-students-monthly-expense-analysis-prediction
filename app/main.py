@@ -8,19 +8,20 @@ def load_data(filepath):
     return data_df
 
 def handle_categorical_data(col_name):
-    st.write("Total missing values: " +str(univ_df[col_name].isna().sum()))
-    st.write("Unique values:")
+    st.warning("Total missing values: " +str(univ_df[col_name].isna().sum()), icon="⚠️")
+    unique_vals = ''
     for val in univ_df[col_name].unique():
-        st.write(val)
-    st.write("Most frequent value: " +str(univ_df[col_name].mode()[0]))
-    st.write("Replacing missing values with most frequent value from " +col_name+ " column")
+        unique_vals = unique_vals + ' '+ str(val)
+    st.text('Unique values: ' +unique_vals)
+    st.info("Most frequent value: " +str(univ_df[col_name].mode()[0]), icon="ℹ️")
+    st.success('Strategy: Replace missing value with most frequent value from ' +col_name+ ' column' , icon="✅")
 
 def handle_continuous_data(col_name):
-    st.write("Total missing values: " +str(univ_df[col_name].isna().sum()))
-    st.write("Mean: " +str(univ_df[col_name].mean()))
-    st.write("Median: " +str(univ_df[col_name].median())) 
-    st.write("Mean is greater than median! The distribution is positively skewed")
-    st.write("Choosing median imputation for Monthly_expenses_$ column since the distribution is positively skewed.")
+    st.warning("Total missing values: " +str(univ_df[col_name].isna().sum()), icon="⚠️")
+    st.info("Mean: " +str(univ_df[col_name].mean()), icon="ℹ️")
+    st.info("Median: " +str(univ_df[col_name].median()), icon="ℹ️") 
+    st.text("Observation: Mean is greater than median! The distribution is positively skewed")
+    st.success("Strategy: Use median imputation for Monthly_expenses_$ column since the distribution is positively skewed.", icon="✅")
 
 
 
@@ -43,7 +44,7 @@ if st.sidebar.checkbox('Data cleaning strategies'):
     # ToDo: Add code to show Unique values per column, NA values per column and showcase data transformation strategies 
     selected_option = st.selectbox(
         "Choose a column to view data cleaning and transformations",
-        ("Study_year","Living","Part_time_job","Transporting","Smoking","Drinks","Cosmetics_&_Self-care","Monthly_Subscription", "Monthly_expenses_$", "Home phone", "Mobile phone"),
+        ("Study_year","Living","Part_time_job","Transporting","Smoking","Drinks","Cosmetics_&_Self-care","Monthly_Subscription", "Monthly_expenses_$"),
     )
 
     if(selected_option == 'Monthly_expenses_$'):
