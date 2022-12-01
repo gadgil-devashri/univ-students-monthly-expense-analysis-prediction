@@ -3,9 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 @st.cache
-def load_data():
-    univ_df = pd.read_csv('../data/University Students Monthly Expenses.csv')
-    return univ_df
+def load_data(filepath):
+    data_df = pd.read_csv(filepath)
+    return data_df
 
 def handle_categorical_data(col_name):
     st.write("Total missing values: " +str(univ_df[col_name].isna().sum()))
@@ -25,20 +25,8 @@ def handle_continuous_data(col_name):
 
 
 # load the data
-univ_df = load_data()
-
-
-# Data cleaning and transformation
-univ_df_clean = univ_df.copy()
-# Replace NA values in Monthly_expenses_$ with median of the available Monthly_expenses_$ values
-univ_df_clean['Monthly_expenses_$'] = univ_df_clean['Monthly_expenses_$'].fillna(univ_df_clean['Monthly_expenses_$'].median())
-univ_df_clean['Monthly_Subscription'] = univ_df_clean['Monthly_Subscription'].fillna(univ_df_clean['Monthly_Subscription'].mode()[0])
-univ_df_clean['Cosmetics_&_Self-care'] = univ_df_clean['Cosmetics_&_Self-care'].fillna(univ_df_clean['Cosmetics_&_Self-care'].mode()[0])
-univ_df_clean['Drinks'] = univ_df_clean['Drinks'].fillna(univ_df_clean['Drinks'].mode()[0])
-univ_df_clean['Transporting'] = univ_df_clean['Transporting'].fillna(univ_df_clean['Transporting'].mode()[0])
-univ_df_clean['Part_time_job'] = univ_df_clean['Part_time_job'].fillna(univ_df_clean['Part_time_job'].mode()[0])
-univ_df_clean['Living'] = univ_df_clean['Living'].fillna(univ_df_clean['Living'].mode()[0])
-univ_df_clean['Study_year'] = univ_df_clean['Study_year'].fillna(univ_df_clean['Study_year'].mode()[0])
+univ_df = load_data('../data/University Students Monthly Expenses.csv')
+univ_df_clean = load_data('../data/univ_clean.csv')
 
 
 
@@ -48,6 +36,7 @@ st.title('University Students Monthly Expenses')
 if st.sidebar.checkbox('Show Original data'):
     st.header("Original Data")
     st.write(univ_df)
+    st.write(univ_df.isna().sum())
 
 if st.sidebar.checkbox('Data cleaning strategies'):
     st.write("Total number of records in the dataframe: " + str(len(univ_df)))
@@ -65,6 +54,7 @@ if st.sidebar.checkbox('Data cleaning strategies'):
 if st.sidebar.checkbox('Show Cleaned data'):
     st.header("Cleaned data")
     st.write(univ_df_clean)
+    st.write(univ_df_clean.isna().sum())
 
 
 
