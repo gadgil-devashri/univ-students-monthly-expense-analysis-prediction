@@ -59,12 +59,54 @@ if st.sidebar.checkbox('Show Cleaned data'):
     st.write(univ_df_clean)
     #st.write(univ_df_clean.isna().sum())
 
+tab1, tab2, tab3 = st.tabs(["Cat", "Population per category", "Owl"])
 
-
-age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
-c= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
+with tab1:
+    st.header("A cat")
+    age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
+    bar_1= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
     x='Age:O',
     y=alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
     color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
     tooltip='Monthly_expenses_$:Q')
-st.altair_chart(c, use_container_width=True)
+    st.altair_chart(bar_1, use_container_width=True)
+
+with tab2:
+    st.header("Data distribution")
+    col1, col2 = st.columns(2)
+    with col1:
+        Gender_pop = univ_df_clean.groupby('Gender').size().reset_index(name='counts')
+        donut_3 = alt.Chart(Gender_pop, title='Students belonging to each gender').mark_arc(innerRadius=50).encode(
+        theta=alt.Theta(field="counts", type="quantitative"),
+        color=alt.Color(field="Gender", type="nominal"),
+        tooltip='counts:Q'
+        )
+        st.altair_chart(donut_3, use_container_width=True)
+        study_year_pop = univ_df_clean.groupby('Study_year').size().reset_index(name='counts')
+        donut_1 = alt.Chart(study_year_pop, title='Number of students in each study year').mark_arc(innerRadius=50).encode(
+        theta=alt.Theta(field="counts", type="quantitative"),
+        color=alt.Color(field="Study_year", type="nominal"),
+        tooltip='counts:Q'
+        )
+        st.altair_chart(donut_1, use_container_width=True)
+
+    with col2:
+        Age_pop = univ_df_clean.groupby('Age').size().reset_index(name='counts')
+        donut_4 = alt.Chart(Age_pop, title='Number of students belonging to each age group').mark_arc(innerRadius=50).encode(
+        theta=alt.Theta(field="counts", type="quantitative"),
+        color=alt.Color(field="Age", type="nominal"),
+        tooltip='counts:Q'
+        )
+        st.altair_chart(donut_4, use_container_width=True)
+
+        Living_pop = univ_df_clean.groupby('Living').size().reset_index(name='counts')
+        donut_2 = alt.Chart(Living_pop, title='Number of students in each living arrangement').mark_arc(innerRadius=50).encode(
+        theta=alt.Theta(field="counts", type="quantitative"),
+        color=alt.Color(field="Living", type="nominal"),
+        tooltip='counts:Q'
+        )
+        st.altair_chart(donut_2, use_container_width=True)
+
+    
+
+    
