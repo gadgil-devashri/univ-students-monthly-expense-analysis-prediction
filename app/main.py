@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import altair as alt
 import numpy as np
 
+# Use the full page instead of a narrow central column
+st.set_page_config(layout="wide")
+
 @st.cache
 def load_data(filepath):
     data_df = pd.read_csv(filepath)
