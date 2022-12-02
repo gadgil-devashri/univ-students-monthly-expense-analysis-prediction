@@ -102,6 +102,13 @@ with tab2:
         st.altair_chart(donut_2, use_container_width=True)
 
 with tab3:
+    # scatter_1 = alt.Chart(univ_df_clean).mark_circle(size=60).encode(
+    # x='Age',
+    # y='Monthly_expenses_$',
+    # color='Gender',
+    # tooltip=['Gender', 'Age', 'Monthly_expenses_$']).interactive()
+    # st.altair_chart(scatter_1, use_container_width=True)
+
     age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
     bar_1= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
     x='Age:O',
@@ -110,6 +117,26 @@ with tab3:
     tooltip='Monthly_expenses_$:Q')
     st.altair_chart(bar_1, use_container_width=True)
 
+    heat_map_1 = alt.Chart(univ_df_clean, title='Impact of smoking on monthly expenses').mark_rect().encode(
+    alt.X('Smoking:N'),
+    alt.Y('Study_year:N'),
+    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+    tooltip='Monthly_expenses_$:Q')
+    st.altair_chart(heat_map_1, use_container_width=True)
+
+    heat_map_2 = alt.Chart(univ_df_clean, title='Impact of drinks on monthly expenses').mark_rect().encode(
+    alt.X('Drinks:N'),
+    alt.Y('Study_year:N'),
+    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+    tooltip='Monthly_expenses_$:Q')
+    st.altair_chart(heat_map_2, use_container_width=True)
+
+    heat_map_3 = alt.Chart(univ_df_clean, title='Impact of living situation on monthly expenses').mark_rect().encode(
+    alt.X('Living:N'),
+    alt.Y('Study_year:N'),
+    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+    tooltip='Monthly_expenses_$:Q')
+    st.altair_chart(heat_map_3, use_container_width=True)
 
     
 
