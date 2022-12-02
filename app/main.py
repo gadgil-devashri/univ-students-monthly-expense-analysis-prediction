@@ -10,7 +10,7 @@ def load_data(filepath):
     return data_df
 
 def handle_categorical_data(col_name):
-    st.warning("Total missing values: " +str(univ_df[col_name].isna().sum()), icon="⚠️")
+    st.warning("Total missing values in original dataset: " +str(univ_df[col_name].isna().sum()), icon="⚠️")
     unique_vals = ''
     for val in univ_df[col_name].unique():
         unique_vals = unique_vals + ' '+ str(val)
@@ -19,7 +19,7 @@ def handle_categorical_data(col_name):
     st.success('Strategy: Replace missing value with most frequent value from ' +col_name+ ' column' , icon="✅")
 
 def handle_continuous_data(col_name):
-    st.warning("Total missing values: " +str(univ_df[col_name].isna().sum()), icon="⚠️")
+    st.warning("Total missing values in original dataset: " +str(univ_df[col_name].isna().sum()), icon="⚠️")
     st.info("Mean: " +str(univ_df[col_name].mean()), icon="ℹ️")
     st.info("Median: " +str(univ_df[col_name].median()), icon="ℹ️") 
     st.text("Observation: Mean is greater than median! The distribution is positively skewed")
@@ -41,7 +41,14 @@ if st.sidebar.checkbox('Show Original data'):
     st.write(univ_df)
     #st.write(univ_df.isna().sum())
 
-if st.sidebar.checkbox('Data cleaning strategies'):
+if st.sidebar.checkbox('Show Cleaned data'):
+    st.header("Cleaned data")
+    st.write(univ_df_clean)
+    #st.write(univ_df_clean.isna().sum())
+
+tab1, tab2, tab3 = st.tabs(["Data cleaning strategies", "Population per category", "Visualizations"])
+
+with tab1:
     st.write("Total number of records in the dataframe: " + str(len(univ_df)))
     # ToDo: Add code to show Unique values per column, NA values per column and showcase data transformation strategies 
     selected_option = st.selectbox(
@@ -53,23 +60,7 @@ if st.sidebar.checkbox('Data cleaning strategies'):
         handle_continuous_data('Monthly_expenses_$')
     else:
         handle_categorical_data(selected_option)
-
-if st.sidebar.checkbox('Show Cleaned data'):
-    st.header("Cleaned data")
-    st.write(univ_df_clean)
-    #st.write(univ_df_clean.isna().sum())
-
-tab1, tab2, tab3 = st.tabs(["Cat", "Population per category", "Owl"])
-
-with tab1:
-    st.header("A cat")
-    age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
-    bar_1= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
-    x='Age:O',
-    y=alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
-    color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
-    tooltip='Monthly_expenses_$:Q')
-    st.altair_chart(bar_1, use_container_width=True)
+    
 
 with tab2:
     st.header("Data distribution")
@@ -106,6 +97,16 @@ with tab2:
         tooltip='counts:Q'
         )
         st.altair_chart(donut_2, use_container_width=True)
+
+with tab3:
+    age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
+    bar_1= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
+    x='Age:O',
+    y=alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
+    color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
+    tooltip='Monthly_expenses_$:Q')
+    st.altair_chart(bar_1, use_container_width=True)
+
 
     
 
