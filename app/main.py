@@ -109,6 +109,8 @@ with tab3:
     # tooltip=['Gender', 'Age', 'Monthly_expenses_$']).interactive()
     # st.altair_chart(scatter_1, use_container_width=True)
 
+    st.title('Bar charts')
+
     age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
     bar_1= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
     x='Age:O',
@@ -116,6 +118,8 @@ with tab3:
     color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
     tooltip='Monthly_expenses_$:Q')
     st.altair_chart(bar_1, use_container_width=True)
+
+    st.title('Heat maps')
 
     heat_map_1 = alt.Chart(univ_df_clean, title='Impact of smoking on monthly expenses').mark_rect().encode(
     alt.X('Smoking:N'),
