@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import altair as alt
+import numpy as np
 
 @st.cache
 def load_data(filepath):
@@ -37,7 +39,7 @@ st.title('University Students Monthly Expenses')
 if st.sidebar.checkbox('Show Original data'):
     st.header("Original Data")
     st.write(univ_df)
-    st.write(univ_df.isna().sum())
+    #st.write(univ_df.isna().sum())
 
 if st.sidebar.checkbox('Data cleaning strategies'):
     st.write("Total number of records in the dataframe: " + str(len(univ_df)))
@@ -55,7 +57,14 @@ if st.sidebar.checkbox('Data cleaning strategies'):
 if st.sidebar.checkbox('Show Cleaned data'):
     st.header("Cleaned data")
     st.write(univ_df_clean)
-    st.write(univ_df_clean.isna().sum())
+    #st.write(univ_df_clean.isna().sum())
 
 
 
+age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
+c= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
+    x='Age:O',
+    y=alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
+    color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
+    tooltip='Monthly_expenses_$:Q')
+st.altair_chart(c, use_container_width=True)
