@@ -119,6 +119,16 @@ with tab3:
     tooltip='Monthly_expenses_$:Q')
     st.altair_chart(bar_1, use_container_width=True)
 
+    barchart_2 = alt.Chart(univ_df_clean, title = "Students Part Time Job status based on living situation").mark_bar().encode(
+    x='Living',
+    y=alt.Y('count(Part_time_job)',title = "Number of Students"),
+    color='Part_time_job').properties(
+    width=600,
+    height=400).interactive()
+    st.altair_chart(barchart_2,use_container_width=True)
+
+
+
     st.title('Heat maps')
 
     heat_map_1 = alt.Chart(univ_df_clean, title='Impact of smoking on monthly expenses').mark_rect().encode(
@@ -141,6 +151,19 @@ with tab3:
     alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
     tooltip='Monthly_expenses_$:Q')
     st.altair_chart(heat_map_3, use_container_width=True)
+
+    st.title("Line charts")
+
+    lineChart = alt.Chart(univ_df_clean,title = "Gender vs mode of transportation").mark_line().encode(
+    x='Transporting',
+    y=alt.Y('count(Gender)', title = "Student Count"),
+    color='Gender',
+    strokeDash='Gender')
+    st.altair_chart(lineChart, use_container_width=True)
+
+    
+   
+   
 
     
 
