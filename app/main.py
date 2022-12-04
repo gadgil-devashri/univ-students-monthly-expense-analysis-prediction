@@ -128,6 +128,15 @@ with tab3:
     st.altair_chart(barchart_2,use_container_width=True)
 
 
+    freshman_vs_senior = univ_df_clean.groupby('Study_year')['Monthly_expenses_$'].mean().reset_index()
+    barchart_3= alt.Chart(freshman_vs_senior, title='Monthly Expenses by Study Year').mark_bar().encode(
+    alt.X('Study_year:N', title = 'Study Year'),
+    alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
+    color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
+    tooltip='Monthly_expenses_$:Q')
+    st.altair_chart(barchart_3, use_container_width=True)
+
+
 
     st.title('Heat maps')
 
@@ -151,6 +160,14 @@ with tab3:
     alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
     tooltip='Monthly_expenses_$:Q')
     st.altair_chart(heat_map_3, use_container_width=True)
+
+
+    heat_map_4 = alt.Chart(univ_df_clean, title='Varying Monthly Expenses by Gender').mark_rect().encode(
+    alt.X('Gender:N'),
+    alt.Y('Study_year:N'),
+    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+    tooltip='Monthly_expenses_$:Q')
+    st.altair_chart(heat_map_4, use_container_width=True)
 
     st.title("Line charts")
 
