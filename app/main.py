@@ -122,7 +122,8 @@ with tab3:
     barchart_2 = alt.Chart(univ_df_clean, title = "Students Part Time Job status based on living situation").mark_bar().encode(
     x='Living',
     y=alt.Y('count(Part_time_job)',title = "Number of Students"),
-    color='Part_time_job').properties(
+    color='Part_time_job', 
+    tooltip = 'count(Part_time_job)').properties(
     width=600,
     height=400).interactive()
     st.altair_chart(barchart_2,use_container_width=True)
@@ -175,7 +176,8 @@ with tab3:
     x='Transporting',
     y=alt.Y('count(Gender)', title = "Student Count"),
     color='Gender',
-    strokeDash='Gender')
+    strokeDash='Gender',
+    tooltip = 'count(Transporting)')
     st.altair_chart(lineChart, use_container_width=True)
 
     
