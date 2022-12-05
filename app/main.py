@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import altair as alt
 import numpy as np
+from pycaret.classification import *
 
 # Use the full page instead of a narrow central column
 st.set_page_config(layout="wide")
@@ -11,6 +12,25 @@ st.set_page_config(layout="wide")
 def load_data(filepath):
     data_df = pd.read_csv(filepath)
     return data_df
+
+@st.cache
+def LoadingInsightsJustForYou(orig_df):
+    df = orig_df.copy()
+    bins = [120, 150, 180, 210, 240, 270, 300, 330, 360]
+    labels = [120,150,180,210,240,270,300, 330]
+    df['Monthly_Expenses'] = pd.cut(df['Monthly_expenses_$'], bins=bins, labels=labels)
+    df = df.drop('Monthly_expenses_$', axis =1)
+    df = df.astype('category')
+    df['Study_year'] = pd.to_numeric(df['Study_year'])
+
+    clf = setup(data = df, target = 'Monthly_Expenses',
+                       data_split_shuffle=False,
+                       silent=True, verbose=False)
+
+    model = create_model('dt', verbose=False)
+    
+    return model
+
 
 def handle_categorical_data(col_name):
     st.warning("Total missing values in original dataset: " +str(univ_df[col_name].isna().sum()), icon="⚠️")
@@ -35,7 +55,6 @@ univ_df = load_data('../data/University Students Monthly Expenses.csv')
 univ_df_clean = load_data('../data/univ_clean.csv')
 
 
-
 st.title('University Students Monthly Expenses')
 
 # show the data in a table
@@ -49,7 +68,7 @@ if st.sidebar.checkbox('Show Cleaned data'):
     st.write(univ_df_clean)
     #st.write(univ_df_clean.isna().sum())
 
-tab1, tab2, tab3 = st.tabs(["Data cleaning strategies", "Population per category", "Visualizations"])
+tab1, tab2, tab3, tab4 = st.tabs(["Data cleaning strategies", "Population per category", "Data Visualizations", "Estimate your Expenses"])
 
 with tab1:
     st.write("Total number of records in the dataframe: " + str(len(univ_df)))
@@ -110,65 +129,68 @@ with tab3:
     # st.altair_chart(scatter_1, use_container_width=True)
 
     st.title('Bar charts')
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
+        bar_1= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
+        x='Age:O',
+        y=alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
+        color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
+        tooltip='Monthly_expenses_$:Q')
+        st.altair_chart(bar_1, use_container_width=True)
 
-    age_vs_avg_monthly_income = univ_df_clean.groupby('Age')['Monthly_expenses_$'].mean().reset_index()
-    bar_1= alt.Chart(age_vs_avg_monthly_income, title='Age Vs Average monthly expense in $').mark_bar().encode(
-    x='Age:O',
-    y=alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
-    color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
-    tooltip='Monthly_expenses_$:Q')
-    st.altair_chart(bar_1, use_container_width=True)
+    with col2:
+        barchart_2 = alt.Chart(univ_df_clean, title = "Students Part Time Job status based on living situation").mark_bar().encode(
+        x='Living',
+        y=alt.Y('count(Part_time_job)',title = "Number of Students"),
+        color='Part_time_job', 
+        tooltip = 'count(Part_time_job)').properties(
+        width=600,
+        height=400).interactive()
+        st.altair_chart(barchart_2,use_container_width=True)
 
-    barchart_2 = alt.Chart(univ_df_clean, title = "Students Part Time Job status based on living situation").mark_bar().encode(
-    x='Living',
-    y=alt.Y('count(Part_time_job)',title = "Number of Students"),
-    color='Part_time_job', 
-    tooltip = 'count(Part_time_job)').properties(
-    width=600,
-    height=400).interactive()
-    st.altair_chart(barchart_2,use_container_width=True)
-
-
-    freshman_vs_senior = univ_df_clean.groupby('Study_year')['Monthly_expenses_$'].mean().reset_index()
-    barchart_3= alt.Chart(freshman_vs_senior, title='Monthly Expenses by Study Year').mark_bar().encode(
-    alt.X('Study_year:N', title = 'Study Year'),
-    alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
-    color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
-    tooltip='Monthly_expenses_$:Q')
-    st.altair_chart(barchart_3, use_container_width=True)
-
-
+    with col3:
+        freshman_vs_senior = univ_df_clean.groupby('Study_year')['Monthly_expenses_$'].mean().reset_index()
+        barchart_3= alt.Chart(freshman_vs_senior, title='Monthly Expenses by Study Year').mark_bar().encode(
+        alt.X('Study_year:N', title = 'Study Year'),
+        alt.Y('Monthly_expenses_$:Q', title='Average Monthly Expense($)'),
+        color= alt.Color('Monthly_expenses_$:Q', legend=alt.Legend(title=None, orient="right")),
+        tooltip='Monthly_expenses_$:Q')
+        st.altair_chart(barchart_3, use_container_width=True)
 
     st.title('Heat maps')
+    col4, col5 = st.columns(2)
+    with col4:
+        heat_map_1 = alt.Chart(univ_df_clean, title='Impact of smoking on monthly expenses').mark_rect().encode(
+        alt.X('Smoking:N'),
+        alt.Y('Study_year:N'),
+        alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+        tooltip='Monthly_expenses_$:Q')
+        st.altair_chart(heat_map_1, use_container_width=True)
+    with col5:
+        heat_map_2 = alt.Chart(univ_df_clean, title='Impact of drinks on monthly expenses').mark_rect().encode(
+        alt.X('Drinks:N'),
+        alt.Y('Study_year:N'),
+        alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+        tooltip='Monthly_expenses_$:Q')
+        st.altair_chart(heat_map_2, use_container_width=True)
 
-    heat_map_1 = alt.Chart(univ_df_clean, title='Impact of smoking on monthly expenses').mark_rect().encode(
-    alt.X('Smoking:N'),
-    alt.Y('Study_year:N'),
-    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
-    tooltip='Monthly_expenses_$:Q')
-    st.altair_chart(heat_map_1, use_container_width=True)
+    col6, col7 = st.columns(2)
+    with col6:
+        heat_map_3 = alt.Chart(univ_df_clean, title='Impact of living situation on monthly expenses').mark_rect().encode(
+        alt.X('Living:N'),
+        alt.Y('Study_year:N'),
+        alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+        tooltip='Monthly_expenses_$:Q')
+        st.altair_chart(heat_map_3, use_container_width=True)
 
-    heat_map_2 = alt.Chart(univ_df_clean, title='Impact of drinks on monthly expenses').mark_rect().encode(
-    alt.X('Drinks:N'),
-    alt.Y('Study_year:N'),
-    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
-    tooltip='Monthly_expenses_$:Q')
-    st.altair_chart(heat_map_2, use_container_width=True)
-
-    heat_map_3 = alt.Chart(univ_df_clean, title='Impact of living situation on monthly expenses').mark_rect().encode(
-    alt.X('Living:N'),
-    alt.Y('Study_year:N'),
-    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
-    tooltip='Monthly_expenses_$:Q')
-    st.altair_chart(heat_map_3, use_container_width=True)
-
-
-    heat_map_4 = alt.Chart(univ_df_clean, title='Varying Monthly Expenses by Gender').mark_rect().encode(
-    alt.X('Gender:N'),
-    alt.Y('Study_year:N'),
-    alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
-    tooltip='Monthly_expenses_$:Q')
-    st.altair_chart(heat_map_4, use_container_width=True)
+    with col7:
+        heat_map_4 = alt.Chart(univ_df_clean, title='Varying Monthly Expenses by Gender').mark_rect().encode(
+        alt.X('Gender:N'),
+        alt.Y('Study_year:N'),
+        alt.Color('Monthly_expenses_$:Q', scale=alt.Scale(scheme='greenblue')),
+        tooltip='Monthly_expenses_$:Q')
+        st.altair_chart(heat_map_4, use_container_width=True)
 
     st.title("Line charts")
 
@@ -180,9 +202,42 @@ with tab3:
     tooltip = 'count(Transporting)')
     st.altair_chart(lineChart, use_container_width=True)
 
+with tab4:
+    st.header("Estimate your Monthly Expenses")
+    st.write("Fill in the information below to begin")
+    model = LoadingInsightsJustForYou(univ_df_clean)
+    col1, col2, _, col3, _ = st.columns((2,2,1,1,1))
+    inputs = {}
+    with col1:
+        inputs["Gender"] = st.selectbox('What is your preferred gender',('Male', 'Female')) 
+        inputs["Age"] = st.slider('How old are you?', 0, 130,)
+        inputs["Study_year"] = st.slider('What is your year of study', 1, 4)
+        inputs["Living"] = st.selectbox('Where do you live?',('Home', 'Hostel')) 
+        inputs["Scholarship"] = st.selectbox('Are you on a scholarship?',('Yes', 'No'))
+        inputs["Part_time_job"] = st.selectbox('Do you work part time?',('Yes', 'No'))
     
-   
-   
+    with col2:
+        inputs["Transporting"] = st.selectbox('Do you have a preferred mode of transport?',('Car', 'Motorcycle', 'No')) 
+        inputs["Smoking"] = st.selectbox('Do you smoke often?',('Yes', 'No')) 
+        inputs["Drinks"] = st.selectbox('Do you drink often?',('Yes', 'No')) 
+        inputs["Games_&_Hobbies"] = st.selectbox('Do you indulge in games and hobbies often?',('Yes', 'No'))
+        inputs["Cosmetics_&_Self-care"] = st.selectbox('Do you invest in cosmetic and self care products?',('Yes', 'No')) 
+        inputs["Monthly_Subscription"] = st.selectbox('Do you have monthly subscriptions',('Yes', 'No')) 
+    
+    with col3:
+        st.write('')
+        st.write('')
+        st.write('')
+        input_df = pd.DataFrame.from_dict([inputs])
+        pred = predict_model(model, data = input_df)
+        expense = f"{pred['Label'].iloc[0]} $"
+        st.metric(label="Estimated Expenses", value=expense)
+
+    st.header("Prediction Insights")
+    st.write("The chart below shows which responses have the most influence on the expenses")
+    plot_model(model, plot = 'feature_all', save = True)
+    st.image('Feature Importance (All).png')
+
 
     
 
