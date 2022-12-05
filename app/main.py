@@ -51,8 +51,8 @@ def handle_continuous_data(col_name):
 
 
 # load the data
-univ_df = load_data('../data/University Students Monthly Expenses.csv')
-univ_df_clean = load_data('../data/univ_clean.csv')
+univ_df = load_data('data/University Students Monthly Expenses.csv')
+univ_df_clean = load_data('data/univ_clean.csv')
 
 
 st.title('University Students Monthly Expenses')
