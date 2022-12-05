@@ -206,7 +206,7 @@ with tab4:
     st.header("Estimate your Monthly Expenses")
     st.write("Fill in the information below to begin")
     model = LoadingInsightsJustForYou(univ_df_clean)
-    col1, col2, _, col3, _ = st.columns((2,2,1,1,1))
+    col1, col2, _, col3, _ = st.columns((3,3,1,2,1))
     inputs = {}
     with col1:
         inputs["Gender"] = st.selectbox('What is your preferred gender',('Male', 'Female')) 
